@@ -1,35 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from 'react';
+
+// Use environment variable for the backend URL
+const API_URL = process.env.REACT_APP_API_URL;
 
 function App() {
   const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState("");
+  const [newTask, setNewTask] = useState('');
 
-  // Fetch tasks from backend
+  // Fetch all tasks from backend
   const fetchTasks = async () => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/tasks`);
-      const data = await res.json();
+      const response = await fetch(`${API_URL}/api/tasks`);
+      const data = await response.json();
       setTasks(data);
-    } catch (err) {
-      console.error("Error fetching tasks:", err);
-    }
-  };
-
-  // Add a new task
-  const addTask = async () => {
-    if (!newTask) return;
-
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/tasks/add`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: newTask }),
-      });
-      const data = await res.json();
-      setTasks([...tasks, data]);
-      setNewTask("");
-    } catch (err) {
-      console.error("Error adding task:", err);
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
     }
   };
 
@@ -37,26 +22,45 @@ function App() {
     fetchTasks();
   }, []);
 
+  // Add a new task
+  const addTask = async (e) => {
+    e.preventDefault();
+    if (!newTask.trim()) return;
+
+    try {
+      const response = await fetch(`${API_URL}/api/tasks/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: newTask }),
+      });
+      const data = await response.json();
+      setTasks([...tasks, data]);
+      setNewTask('');
+    } catch (error) {
+      console.error('Error adding task:', error);
+    }
+  };
+
   return (
-    <div style={{ padding: "2rem", fontFamily: "Arial" }}>
+    <div style={{ padding: '2rem', fontFamily: 'Arial, sans-serif' }}>
       <h1>TaskMaster</h1>
 
-      <div style={{ marginBottom: "1rem" }}>
+      <form onSubmit={addTask}>
         <input
           type="text"
-          placeholder="New Task"
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
-          style={{ marginRight: "0.5rem", padding: "0.3rem" }}
+          placeholder="New task"
+          style={{ padding: '0.5rem', width: '300px', marginRight: '0.5rem' }}
         />
-        <button onClick={addTask} style={{ padding: "0.3rem 0.6rem" }}>
-          Add Task
-        </button>
-      </div>
+        <button type="submit" style={{ padding: '0.5rem 1rem' }}>Add Task</button>
+      </form>
 
-      <ul>
+      <ul style={{ marginTop: '2rem' }}>
         {tasks.map((task) => (
-          <li key={task._id}>{task.title}</li>
+          <li key={task._id} style={{ marginBottom: '0.5rem' }}>
+            {task.title}
+          </li>
         ))}
       </ul>
     </div>
