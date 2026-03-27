@@ -1,22 +1,20 @@
-const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
+require("dotenv").config();
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
 
 const app = express();
 
-const routeTasks = require('./src/routes/tasks');
+app.use(cors());
+app.use(express.json());
 
-app.use(express.static(path.join(__dirname, 'client/build')));
-app.use(bodyParser.json());
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch(err => console.log(err));
 
-app.use('/api/tasks', routeTasks, (req, res) => res.sendStatus(401));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname + '/client/build/index.html'));
+app.get("/", (req, res) => {
+  res.send("API is running");
 });
 
-const port = process.env.PORT || 5000;
-app.listen(port);
-
-console.log(`listening on ${port}`);
-
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
