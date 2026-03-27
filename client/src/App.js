@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-// Use environment variable for the backend URL
-const API_URL = process.env.REACT_APP_API_URL;
+// Use Netlify environment variable if available, otherwise fallback to Render URL
+const API_URL = process.env.REACT_APP_API_URL || 'https://simple-mern-d0hc.onrender.com';
 
 function App() {
   const [tasks, setTasks] = useState([]);
